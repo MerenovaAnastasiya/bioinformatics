@@ -73,8 +73,10 @@ def search_orf(dna, is_straight):
 
 
 def main():
+    print('Please, enter DNA`s length')
     dna_length = int(input())
     check_dna_length(dna_length)
+    print('Please, GC percent')
     gc_percent = int(input())
     check_gc(gc_percent)
     dna = generate_random_dna(dna_length, gc_percent)
@@ -108,8 +110,8 @@ def main():
 
 
 def check_dna_length(dna_length):
-    if dna_length < 100 or dna_length > 1000 or dna_length % 3 != 0:
-        raise Exception('String length should be divided by 3 and in the range from 100 to 1000')
+    if dna_length < 100 or dna_length > 1000:
+        raise Exception('String length should be in the range from 100 to 1000')
 
 
 def check_gc(gc_percent):
