@@ -27,11 +27,18 @@ translated_protein_map = {'ttt': 'phe', 'ttc': 'phe', 'tta': 'leu',
                           'tga': 'STOP'
                           }
 
+switch_dna_map = {
+    'c': 'g',
+    'g': 'c',
+    'a': 't',
+    't': 'a'
+}
+
 
 def search_max_orf(dna, is_straight):
-    max_orf_1 = search_orf(dna, is_straight)
-    max_orf_2 = search_orf(dna[1:], is_straight)
-    max_orf_3 = search_orf(dna[2:], is_straight)
+    max_orf_1 = search_orf(dna, is_straight, 0)
+    max_orf_2 = search_orf(dna, is_straight, 1)
+    max_orf_3 = search_orf(dna, is_straight, 2)
     max_orf = None
     if max_orf_1 is not None:
         max_orf = max_orf_1
@@ -50,13 +57,13 @@ def search_max_orf(dna, is_straight):
     return max_orf
 
 
-def search_orf(dna, is_straight):
+def search_orf(dna, is_straight, start):
     max_len = 0
     max_orf_start = -1
     max_orf_end = -1
     max_orf = ''
     orf_start = -1
-    for i in range(0, len(dna), 3):
+    for i in range(start, len(dna), 3):
         if dna[i:i + 3] == START_CODON and orf_start == -1:
             orf_start = i
         if orf_start != -1 and stop_codons.__contains__(dna[i:i + 3]):
@@ -72,18 +79,25 @@ def search_orf(dna, is_straight):
     return None
 
 
+def generate_opposite_dna(dna):
+    opposite_dna = ''
+    for i in dna:
+        opposite_dna += switch_dna_map.get(i)
+    return opposite_dna[::-1]
+
+
 def main():
     print('Please, enter DNA`s length')
     dna_length = int(input())
     check_dna_length(dna_length)
-    print('Please, GC percent')
+    print('Please, enter GC percent')
     gc_percent = int(input())
     check_gc(gc_percent)
     dna = generate_random_dna(dna_length, gc_percent)
     print('Generated DNA is {}'.format(dna))
-    reversed_dna = dna[::-1]
+    opposite_dna = generate_opposite_dna(dna)
     max_orf = search_max_orf(dna, True)
-    max_reversed_orf = search_max_orf(reversed_dna, False)
+    max_reversed_orf = search_max_orf(opposite_dna, False)
     if max_orf is None:
         if max_reversed_orf is None:
             print("DNA doesn't have ORF")
@@ -97,12 +111,12 @@ def main():
         print('The ORF`s length is so short')
     else:
         print('The max ORF is', end=' ')
-        for i in range(0, len(max_orf.orf) - 3, 3):
+        for i in range(0, len(max_orf.orf), 3):
             print(max_orf.orf[i:i+3], end=' ')
         print()
         print('Translated protein is {}'.format(max_orf.translated_orf))
 
-        print('ORF range is [{},{}]'.format(max_orf.start + 1, max_orf.end + 1))
+        print('ORF range is [{},{}]'.format(max_orf.start + 1, max_orf.end))
         if max_orf.is_straight:
             print('DNA direction is straight')
         else:
