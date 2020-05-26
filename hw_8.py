@@ -16,7 +16,7 @@ def main():
         newick = input()
         if newick == STOP_WORD:
             break
-        print(check_newick(newick))
+        print(check_newick(newick.strip()))
 
 
 def check_newick(newick):
